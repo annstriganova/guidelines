@@ -57,7 +57,7 @@ Local Kafka sandbox for learning purposes with ability to:
                          }' \
               "http://localhost:8081/subjects/test_topic-value/versions"
         ```
-    Output:
+    Expected output:
 
       ```json
       { "id": 1 }
