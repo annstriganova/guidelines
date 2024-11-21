@@ -18,87 +18,87 @@ Local Kafka sandbox for learning purposes with ability to:
 
 ## Steps
 
-1. Start containers, check [Kafka UI](http://localhost:8098/) is available
+1. Start containers
 
-```bash
-docker compose up -d 
-```
+    ```bash
+    docker compose up -d 
+    ```
+    Check [Kafka UI](http://localhost:8098/) is available.
 
 2. Register topic `test_topic`
    * get cluster id
-    ```bash
-    curl -X GET "http://localhost:8082/v3/clusters"
-    ```
+        ```bash
+        curl -X GET "http://localhost:8082/v3/clusters"
+        ```
    * create topic: copy `cluster_id` from the previous response
-    ```bash
-    curl -X POST -H "Content-Type: application/json" \
-         --data-raw '{
-                        "topic_name": "test_topic"
-                     }' \
-         "http://localhost:8082/v3/clusters/{cluster_id}/topics"
-    ```
-3. Register JSON schema for topic `test_topic`: note that the schema is a string, thus escape quotes in the JSON object 
-
+        ```bash
+        curl -X POST -H "Content-Type: application/json" \
+             --data-raw '{
+                            "topic_name": "test_topic"
+                         }' \
+             "http://localhost:8082/v3/clusters/{cluster_id}/topics"
+        ```
+3. Register JSON schema for topic `test_topic`: note that the schema is a string, thus escape quotes in the JSON object
    * for key
-    ```bash
-    curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
-         --data-raw '{
-                        "schemaType": "JSON",
-                        "schema": "{\"userId\":\"long\"}"
-                     }' \
-         "http://localhost:8081/subjects/test_topic-key/versions"
-    ```
+        ```bash
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+             --data-raw '{
+                            "schemaType": "JSON",
+                            "schema": "{\"userId\":\"long\"}"
+                         }' \
+             "http://localhost:8081/subjects/test_topic-key/versions"
+        ```
    * for value
-    ```bash
-    curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
-         --data-raw '{
-                        "schemaType": "JSON",
-                        "schema": "{\"text\":\"string\"}"
-                     }' \
-         "http://localhost:8081/subjects/test_topic-value/versions"
-    ```
-Output:
+        ```bash
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+             --data-raw '{
+                            "schemaType": "JSON",
+                            "schema": "{\"text\":\"string\"}"
+                         }' \
+              "http://localhost:8081/subjects/test_topic-value/versions"
+        ```
+    Output:
 
-```json
-{ "id": 1 }
-```
+      ```json
+      { "id": 1 }
+      ```
 
 4. Produce message to `test_topic`: copy `id`s from the previous responses 
 
-```bash
-curl -v -X POST -H "Content-Type: application/vnd.kafka.jsonschema.v2+json" \
-     --data-raw '{
-                    "key_schema_id": {key_schema_id},
-                    "value_schema_id": {value_schema_id},
-                    "records": [
-                      {
-                        "key": {
-                          "userId": 12345
-                        },
-                        "value": {
-                          "text": "Kafka Learner"
-                        }
-                      }
-                    ]
-                 }' \
-     "http://localhost:8082/topics/test_topic"
-```
-Expected output:
+    ```bash
+    curl -v -X POST -H "Content-Type: application/vnd.kafka.jsonschema.v2+json" \
+         --data-raw '{
+                        "key_schema_id": {key_schema_id},
+                        "value_schema_id": {value_schema_id},
+                        "records": [
+                          {
+                            "key": {
+                              "userId": 12345
+                            },
+                            "value": {
+                              "text": "Kafka Learner"
+                            }
+                          }
+                        ]
+                     }' \
+         "http://localhost:8082/topics/test_topic"
+    ```
+    Expected output:
 
-```json
-{
-  "offsets": [
+    ```json
     {
-      "partition": 0,
-      "offset": 0,
-      "error_code": null,
-      "error": null
+      "offsets": [
+        {
+            "partition": 0,
+            "offset": 0,
+            "error_code": null,
+            "error": null
+        }
+      ],
+      "key_schema_id": 1,
+      "value_schema_id": 2
     }
-  ],
-  "key_schema_id": 1,
-  "value_schema_id": 2
-}
-```
+    ```
 5. Consume message from `test_topic`
    * create consumer `test_consumer`: pay attention to `format`, it should be `jsonschema`
      ```bash
