@@ -1,0 +1,79 @@
+networks:
+  default:
+    name: kafka-network
+
+services:
+  kafka-zookeeper:
+    image: "confluentinc/cp-zookeeper:7.7.1"
+    container_name: kafka-zookeeper
+    ports:
+      - "2181:2181"
+      - "2182:2182"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-broker:
+    image: "confluentinc/cp-kafka:7.7.1"
+    container_name: kafka-broker
+    depends_on:
+      - kafka-zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+      - "29093:29093"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "kafka-zookeeper:2181"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_METADATA_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka-broker:29092,PLAINTEXT_HOST://localhost:9092"
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+  kafka-schema-registry:
+    image: "confluentinc/cp-schema-registry:7.7.1"
+    container_name: kafka-schema-registry
+    depends_on:
+      - kafka-zookeeper
+      - kafka-broker
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka-broker:29092"
+      SCHEMA_REGISTRY_DEBUG: true
+
+  kafka-ui:
+    image: "provectuslabs/kafka-ui:v0.7.2"
+    container_name: kafka-ui
+    depends_on:
+      - kafka-zookeeper
+      - kafka-broker
+      - kafka-schema-registry
+    ports:
+      - "8098:8080"
+    environment:
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker:29092
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://kafka-schema-registry:8081"
+
+  kafka-rest-proxy:
+    image: "confluentinc/cp-kafka-rest:7.7.1"
+    container_name: kafka-rest-proxy
+    depends_on:
+      - kafka-broker
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_REST_HOST_NAME: kafka-rest-proxy
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_BOOTSTRAP_SERVERS: "kafka-broker:29092"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: "http://kafka-schema-registry:8081"

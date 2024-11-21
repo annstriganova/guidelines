@@ -6,3 +6,4 @@ Guidelines for various technologies.
 
 * [SonarQube CE](./sonarqube/howto.md)
 * [Grafana Labs + Prometheus](./grafana_labs_prometheus/howto.md)
+* [Kafka](./kafka/howto.md)
