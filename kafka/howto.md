@@ -152,14 +152,14 @@ Local Kafka sandbox for learning purposes with ability to:
 
 ## Ducking Traps
 
-Issues that caught me by surprise during preparation of this tutorial:
+Issues that you might encounter:
 
 1. Problem: error on attempt to consume message using Kafka Rest Proxy
     ```json
     {"error_code":40801,"message":"java.io.CharConversionException: Invalid UTF-32 character..."}
     ```
    _Solution_: change `"format": "json"` to `"format": "jsonschema"` when create a consumer `/consumers/test_consumer_group`
-2. Problem: getting empty `[]` on 1st consume
+2. Problem: getting empty `[]` on the 1st consume
    _Solution_: either run consume twice ([kafka-rest/issues/432](https://github.com/confluentinc/kafka-rest/issues/432)) or use `KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0`
 3. Problem: error on attempt to register schema
     ```json
