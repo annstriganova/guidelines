@@ -52,6 +52,19 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka-broker:29092"
       SCHEMA_REGISTRY_DEBUG: true
 
+  kafka-rest-proxy:
+    image: "confluentinc/cp-kafka-rest:7.7.1"
+    container_name: kafka-rest-proxy
+    depends_on:
+      - kafka-broker
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_REST_HOST_NAME: kafka-rest-proxy
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_BOOTSTRAP_SERVERS: "kafka-broker:29092"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: "http://kafka-schema-registry:8081"
+
   kafka-ui:
     image: "provectuslabs/kafka-ui:v0.7.2"
     container_name: kafka-ui
@@ -65,15 +78,3 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker:29092
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://kafka-schema-registry:8081"
 
-  kafka-rest-proxy:
-    image: "confluentinc/cp-kafka-rest:7.7.1"
-    container_name: kafka-rest-proxy
-    depends_on:
-      - kafka-broker
-    ports:
-      - "8082:8082"
-    environment:
-      KAFKA_REST_HOST_NAME: kafka-rest-proxy
-      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
-      KAFKA_REST_BOOTSTRAP_SERVERS: "kafka-broker:29092"
-      KAFKA_REST_SCHEMA_REGISTRY_URL: "http://kafka-schema-registry:8081"
