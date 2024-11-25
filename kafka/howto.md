@@ -12,9 +12,9 @@ Local Kafka sandbox for learning purposes with ability to:
 1. access [Kafka UI](http://localhost:8098/)
     ![](./img/kafka-ui.png)
 2. register topic using `curl`
-3. register schema `curl`
-4. produce message corresponding to schema
-5. consume message corresponding to schema
+3. register schema using `curl`
+4. produce message corresponding to schema using `curl`
+5. consume message corresponding to schema using `curl`
 
 ## Steps
 
