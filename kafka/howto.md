@@ -66,7 +66,7 @@ Local Kafka sandbox for learning purposes with ability to:
 4. Produce message to `test_topic`: copy `id`s from the previous responses 
 
     ```bash
-    curl -v -X POST -H "Content-Type: application/vnd.kafka.jsonschema.v2+json" \
+    curl -X POST -H "Content-Type: application/vnd.kafka.jsonschema.v2+json" \
          --data-raw '{
                         "key_schema_id": {key_schema_id},
                         "value_schema_id": {value_schema_id},
@@ -143,6 +143,11 @@ Local Kafka sandbox for learning purposes with ability to:
      curl -X DELETE -H "Content-Type: application/vnd.kafka.v2+json" \
           "http://localhost:8082/consumers/test_consumer_group/instances/test_consumer"
      ```
+6. Stop and remove containers
+
+    ```bash
+    docker compose down 
+    ```
 
 ## Links
 
